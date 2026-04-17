@@ -1,0 +1,42 @@
+CREATE TABLE control_produccion (
+    id_control SERIAL PRIMARY KEY,
+    descripcion TEXT,
+    cantidad INTEGER,
+    estado VARCHAR(15)
+);
+
+ALTER TABLE control_produccion
+DROP COLUMN estado;
+
+ALTER TABLE control_produccion
+RENAME TO gestion_produccion;
+
+ALTER TABLE gestion_produccion
+ADD CONSTRAINT unique_descripcion UNIQUE (descripcion);
+
+ALTER TABLE gestion_produccion
+ADD COLUMN fecha_inicio DATE,
+ADD COLUMN fecha_fin DATE;
+
+ALTER TABLE gestion_produccion
+ADD CONSTRAINT check_fechas CHECK (fecha_fin >= fecha_inicio);
+
+ALTER TABLE gestion_produccion
+ADD COLUMN stock INTEGER;
+
+ALTER TABLE gestion_produccion
+ADD CONSTRAINT check_stock CHECK (stock >= 0);
+
+ALTER TABLE gestion_produccion
+ALTER COLUMN descripcion TYPE VARCHAR(200); SELECT * FROM gestion_produccion;
+
+ALTER TABLE gestion_produccion
+ADD CONSTRAINT check_cantidad CHECK (cantidad BETWEEN 1 AND 1000);
+
+CREATE INDEX idx_descripcion
+ON gestion_produccion (descripcion);
+
+ALTER TABLE gestion_produccion
+DROP COLUMN fecha_fin;
+
+TRUNCATE TABLE gestion_produccion;

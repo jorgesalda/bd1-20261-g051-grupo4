@@ -1,0 +1,49 @@
+TRUNCATE TABLE gestion_produccion;
+
+
+ALTER TABLE gestion_produccion
+ADD COLUMN datos_ambientales JSONB;
+
+INSERT INTO gestion_produccion (descripcion, cantidad, stock, fecha_inicio, datos_ambientales)
+VALUES 
+(
+    	'Produccion 1',
+    	50,
+    	20,
+    	'2026-03-20',
+   	 '{
+        "temperatura": 28.5,
+        "humedad": 70,
+        "estado": "estable"
+    }'
+),
+(
+    	'Produccion 2',
+    	80,
+    	30,
+    	'2026-03-21',
+    	'{
+        "temperatura": 30,
+        "humedad": 65,
+        "estado": "alerta"
+    }'
+);
+
+SELECT 
+    	descripcion,
+   	 	datos_ambientales->>'temperatura' AS temperatura
+FROM 	gestion_produccion;
+
+ALTER TABLE productor
+ADD COLUMN info_extra JSONB;
+
+
+UPDATE productor
+SET info_extra = '{
+    "experiencia_anios": 5,
+    "certificado": true
+}';
+
+SELECT *
+FROM productor
+WHERE info_extra @> '{"certificado": true}';
