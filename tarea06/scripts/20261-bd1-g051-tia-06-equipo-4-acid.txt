@@ -1,0 +1,64 @@
+
+
+SELECT id_producto, nombre, precio FROM producto WHERE id_producto IN (1, 2);
+SELECT id_ubicacion, municipio, vereda FROM ubicacion WHERE id_ubicacion = 1;
+
+BEGIN;
+
+    
+    UPDATE producto SET precio = 99999.00 WHERE id_producto = 1;
+
+    
+    UPDATE ubicacion SET vereda = 'Vereda Temporal' WHERE id_ubicacion = 1;
+
+    
+    SELECT id_producto, precio FROM producto WHERE id_producto = 1;
+    SELECT id_ubicacion, vereda FROM ubicacion WHERE id_ubicacion = 1;
+
+ROLLBACK;
+
+
+SELECT id_producto, nombre, precio FROM producto WHERE id_producto IN (1, 2);
+SELECT id_ubicacion, municipio, vereda FROM ubicacion WHERE id_ubicacion = 1;
+
+
+
+BEGIN;
+    INSERT INTO pedido (fecha, id_productor, id_consumidor)
+    VALUES ('2026-04-01', 9999, 1);
+    
+ROLLBACK;
+
+
+BEGIN;
+    INSERT INTO producto (nombre, precio)
+    VALUES ('Miel test', -500.00);
+    
+ROLLBACK;
+
+
+
+BEGIN;
+    UPDATE producto SET precio = 50000.00 WHERE id_producto = 1;
+    
+
+
+SELECT id_producto, nombre, precio FROM producto WHERE id_producto = 1;
+
+COMMIT;
+
+
+SELECT id_producto, nombre, precio FROM producto WHERE id_producto = 1;
+
+
+
+
+BEGIN;
+    INSERT INTO evento (tipo, descripcion, fecha, id_usuario)
+    VALUES ('mantenimiento', 'Evento de prueba ACID - Durabilidad', '2026-04-01', 1);
+COMMIT;
+
+
+SELECT * FROM evento
+WHERE tipo = 'mantenimiento'
+  AND descripcion LIKE '%Durabilidad%';

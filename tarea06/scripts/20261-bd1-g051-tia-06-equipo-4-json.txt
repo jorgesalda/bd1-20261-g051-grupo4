@@ -1,0 +1,70 @@
+
+UPDATE apiario
+SET ubicacion_geografica = '{
+    "coordenadas": {"latitud": 6.25184, "longitud": -75.56359},
+    "altitud_msnm": 1550,
+    "region": {
+        "pais": "Colombia",
+        "departamento": "Antioquia",
+        "municipio": "Medellín",
+        "vereda": "Santa Elena"
+    },
+    "tipo_zona": "rural",
+    "condiciones_ambientales": {
+        "flora_dominante": ["eucalipto", "café"],
+        "fuente_agua_cercana": true
+    }
+}'::JSONB
+WHERE nombre = 'Apiario La Montaña';
+
+
+UPDATE apiario
+SET ubicacion_geografica = '{
+    "coordenadas": {"latitud": 4.7110, "longitud": -74.0721},
+    "altitud_msnm": 2600,
+    "region": {
+        "pais": "Colombia",
+        "departamento": "Cundinamarca",
+        "municipio": "Bogotá",
+        "vereda": "Usme"
+    },
+    "tipo_zona": "periurbana",
+    "condiciones_ambientales": {
+        "flora_dominante": ["pino", "acacia"],
+        "fuente_agua_cercana": false
+    }
+}'::JSONB
+WHERE nombre = 'Apiario El Bosque';
+
+
+SELECT nombre,
+       ubicacion_geografica
+FROM   apiario;
+
+
+SELECT nombre,
+       ubicacion_geografica -> 'coordenadas' ->> 'latitud'  AS latitud,
+       ubicacion_geografica -> 'coordenadas' ->> 'longitud' AS longitud
+FROM   apiario
+WHERE  ubicacion_geografica IS NOT NULL;
+
+
+SELECT nombre,
+       ubicacion_geografica ->> 'tipo_zona'  AS tipo_zona,
+       ubicacion_geografica -> 'region' ->> 'municipio' AS municipio
+FROM   apiario
+WHERE  ubicacion_geografica ->> 'tipo_zona' = 'rural';
+
+
+SELECT nombre,
+       ubicacion_geografica -> 'region' ->> 'municipio'                              AS municipio,
+       ubicacion_geografica -> 'condiciones_ambientales' ->> 'fuente_agua_cercana'   AS agua_cercana
+FROM   apiario
+WHERE  (ubicacion_geografica -> 'condiciones_ambientales' ->> 'fuente_agua_cercana')::BOOLEAN = true;
+
+
+SELECT nombre,
+       (ubicacion_geografica ->> 'altitud_msnm')::INTEGER AS altitud_msnm
+FROM   apiario
+WHERE  ubicacion_geografica IS NOT NULL
+ORDER  BY altitud_msnm DESC;

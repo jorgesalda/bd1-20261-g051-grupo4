@@ -1,0 +1,33 @@
+
+
+UPDATE ubicacion SET vereda = 'El Poblado - Zona Rosa'
+    WHERE municipio = 'Medellín';
+
+
+UPDATE ubicacion SET vereda = 'Chapinero Alto'
+    WHERE municipio = 'Bogotá';
+
+
+UPDATE ubicacion SET vereda = 'Centro Histórico'
+    WHERE municipio = 'Tunja';
+
+
+
+SELECT departamento, municipio, vereda FROM ubicacion;
+
+
+
+UPDATE producto SET precio = 30000.00
+    WHERE nombre = 'Miel de abejas pura';
+
+
+UPDATE producto SET precio = 100000.00
+    WHERE nombre = 'Jalea real fresca';
+
+
+UPDATE producto SET precio = 19500.00
+    WHERE nombre = 'Cera de abejas natural';
+
+
+
+SELECT id_producto, nombre, precio FROM producto ORDER BY id_producto;

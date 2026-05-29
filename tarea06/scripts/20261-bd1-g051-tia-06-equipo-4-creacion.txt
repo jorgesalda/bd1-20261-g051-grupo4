@@ -1,0 +1,167 @@
+
+
+CREATE TABLE rol (
+    id_rol    SERIAL PRIMARY KEY,
+    nombre    VARCHAR(20) NOT NULL UNIQUE
+);
+
+CREATE TABLE usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    nombre     VARCHAR(50) NOT NULL,
+    email      VARCHAR(100) NOT NULL UNIQUE,
+    id_rol     INTEGER NOT NULL REFERENCES rol(id_rol)
+);
+
+CREATE TABLE entidad_apoyo (
+    id_entidad SERIAL PRIMARY KEY,
+    nombre     VARCHAR(100) NOT NULL,
+    tipo       VARCHAR(30) CHECK (tipo IN ('publica','privada','ONG'))
+);
+
+CREATE TABLE ubicacion (
+    id_ubicacion SERIAL PRIMARY KEY,
+    departamento VARCHAR(50) NOT NULL,
+    municipio    VARCHAR(50) NOT NULL,
+    vereda       VARCHAR(80)
+);
+
+CREATE TABLE producto (
+    id_producto  SERIAL PRIMARY KEY,
+    nombre       VARCHAR(50) NOT NULL,
+    precio       NUMERIC(10,2) NOT NULL CHECK (precio >= 0),
+    descripcion  TEXT
+);
+
+CREATE TABLE consumidor (
+    id_consumidor SERIAL PRIMARY KEY,
+    nombre        VARCHAR(80) NOT NULL,
+    email         VARCHAR(100) UNIQUE,
+    telefono      VARCHAR(20)
+);
+
+
+
+CREATE TABLE productor (
+    id_productor SERIAL PRIMARY KEY,
+    nombre       VARCHAR(80) NOT NULL,
+    telefono     VARCHAR(20),
+    id_usuario   INTEGER NOT NULL REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE usuario_rol (
+    id_usuario INTEGER NOT NULL REFERENCES usuario(id_usuario),
+    id_rol     INTEGER NOT NULL REFERENCES rol(id_rol),
+    PRIMARY KEY (id_usuario, id_rol)
+);
+
+CREATE TABLE credito (
+    id_credito   SERIAL PRIMARY KEY,
+    monto        DECIMAL(12,2) NOT NULL CHECK (monto > 0),
+    fecha        DATE NOT NULL,
+    id_productor INTEGER NOT NULL REFERENCES productor(id_productor),
+    id_entidad   INTEGER NOT NULL REFERENCES entidad_apoyo(id_entidad)
+);
+
+CREATE TABLE apiario (
+    id_apiario           SERIAL PRIMARY KEY,
+    nombre               VARCHAR(80) NOT NULL,
+    id_productor         INTEGER NOT NULL REFERENCES productor(id_productor),
+    id_ubicacion         INTEGER REFERENCES ubicacion(id_ubicacion),
+    ubicacion_geografica JSONB
+);
+
+CREATE TABLE colmena (
+    id_colmena SERIAL PRIMARY KEY,
+    codigo     VARCHAR(20) NOT NULL UNIQUE,
+    estado     VARCHAR(20) CHECK (estado IN ('activa','inactiva','cuarentena')),
+    id_apiario INTEGER NOT NULL REFERENCES apiario(id_apiario)
+);
+
+CREATE TABLE sensor (
+    id_sensor  SERIAL PRIMARY KEY,
+    tipo       VARCHAR(25) NOT NULL,
+    id_colmena INTEGER NOT NULL REFERENCES colmena(id_colmena)
+);
+
+CREATE TABLE registro_ambiental (
+    id_registro SERIAL PRIMARY KEY,
+    temperatura NUMERIC(5,2),
+    humedad     NUMERIC(5,2),
+    fecha_hora  TIMESTAMP DEFAULT NOW(),
+    id_sensor   INTEGER NOT NULL REFERENCES sensor(id_sensor)
+);
+
+CREATE TABLE evento (
+    id_evento   SERIAL PRIMARY KEY,
+    tipo        VARCHAR(30) NOT NULL,
+    descripcion TEXT,
+    fecha       DATE NOT NULL,
+    id_usuario  INTEGER NOT NULL REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE sensor_evento (
+    id_sensor INTEGER NOT NULL REFERENCES sensor(id_sensor),
+    id_evento INTEGER NOT NULL REFERENCES evento(id_evento),
+    PRIMARY KEY (id_sensor, id_evento)
+);
+
+CREATE TABLE inspeccion (
+    id_inspeccion SERIAL PRIMARY KEY,
+    fecha         DATE NOT NULL,
+    observaciones TEXT,
+    id_colmena    INTEGER NOT NULL REFERENCES colmena(id_colmena),
+    id_usuario    INTEGER NOT NULL REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE certificacion (
+    id_certificacion SERIAL PRIMARY KEY,
+    nombre           VARCHAR(80) NOT NULL,
+    fecha_emision    DATE NOT NULL,
+    id_inspeccion    INTEGER NOT NULL REFERENCES inspeccion(id_inspeccion)
+);
+
+CREATE TABLE productor_producto (
+    id_productor INTEGER NOT NULL REFERENCES productor(id_productor),
+    id_producto  INTEGER NOT NULL REFERENCES producto(id_producto),
+    PRIMARY KEY (id_productor, id_producto)
+);
+
+CREATE TABLE oferta_trabajo (
+    id_oferta   SERIAL PRIMARY KEY,
+    descripcion TEXT NOT NULL,
+    id_producto INTEGER REFERENCES producto(id_producto)
+);
+
+CREATE TABLE lote_produccion (
+    id_lote     SERIAL PRIMARY KEY,
+    cantidad    INTEGER NOT NULL CHECK (cantidad > 0),
+    fecha       DATE NOT NULL,
+    id_apiario  INTEGER NOT NULL REFERENCES apiario(id_apiario),
+    id_producto INTEGER NOT NULL REFERENCES producto(id_producto)
+);
+
+CREATE TABLE pago (
+    id_pago       SERIAL PRIMARY KEY,
+    monto         DECIMAL(10,2) NOT NULL CHECK (monto > 0),
+    metodo        VARCHAR(20) CHECK (metodo IN ('efectivo','transferencia','PSE')),
+    id_consumidor INTEGER NOT NULL REFERENCES consumidor(id_consumidor)
+);
+
+CREATE TABLE pedido (
+    id_pedido     SERIAL PRIMARY KEY,
+    fecha         DATE NOT NULL DEFAULT CURRENT_DATE,
+    estado        VARCHAR(20) DEFAULT 'pendiente',
+    id_usuario    INTEGER REFERENCES usuario(id_usuario),
+    id_productor  INTEGER NOT NULL REFERENCES productor(id_productor),
+    id_consumidor INTEGER NOT NULL REFERENCES consumidor(id_consumidor),
+    id_pago       INTEGER REFERENCES pago(id_pago)
+);
+
+CREATE TABLE detalle_pedido (
+    id_detalle   SERIAL PRIMARY KEY,
+    cantidad     INTEGER NOT NULL CHECK (cantidad > 0),
+    precio_venta NUMERIC(10,2) NOT NULL CHECK (precio_venta >= 0),
+    id_pedido    INTEGER NOT NULL REFERENCES pedido(id_pedido),
+    id_producto  INTEGER NOT NULL REFERENCES producto(id_producto),
+    id_lote      INTEGER REFERENCES lote_produccion(id_lote)
+);

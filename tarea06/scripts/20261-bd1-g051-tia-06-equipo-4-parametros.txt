@@ -1,0 +1,31 @@
+
+
+PREPARE consulta_pedidos_filtrada (TEXT, TEXT, NUMERIC) AS
+SELECT
+    u.departamento,
+    u.municipio,
+    p.nombre                           AS productor,
+    c.nombre                           AS consumidor,
+    COUNT(DISTINCT pe.id_pedido)       AS total_pedidos,
+    SUM(dp.cantidad * dp.precio_venta) AS monto_COP,
+    MAX(dp.precio_venta)               AS precio_max
+FROM   detalle_pedido dp
+JOIN   pedido         pe ON pe.id_pedido    = dp.id_pedido
+JOIN   consumidor     c  ON c.id_consumidor = pe.id_consumidor
+JOIN   productor      p  ON p.id_productor  = pe.id_productor
+JOIN   apiario        a  ON a.id_productor  = p.id_productor
+JOIN   ubicacion      u  ON u.id_ubicacion  = a.id_ubicacion
+WHERE  u.departamento = $1
+  AND  u.municipio    = $2
+GROUP  BY u.departamento, u.municipio, p.nombre, c.nombre
+HAVING SUM(dp.cantidad * dp.precio_venta) >= $3
+ORDER  BY monto_COP DESC;
+
+
+EXECUTE consulta_pedidos_filtrada('Antioquia', 'Medellín', 50000);
+
+
+EXECUTE consulta_pedidos_filtrada('Cundinamarca', 'Bogotá', 30000);
+
+
+DEALLOCATE consulta_pedidos_filtrada;

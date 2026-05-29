@@ -1,0 +1,49 @@
+
+SELECT DISTINCT municipio
+FROM   ubicacion
+ORDER  BY municipio ASC;
+
+
+SELECT u.departamento, u.municipio
+FROM   ubicacion u
+ORDER  BY u.departamento ASC, u.municipio ASC;
+
+
+SELECT u.departamento,
+       u.municipio,
+       p.nombre AS productor,
+       a.nombre AS apiario
+FROM   ubicacion u
+JOIN   apiario   a ON a.id_ubicacion = u.id_ubicacion
+JOIN   productor p ON p.id_productor = a.id_productor
+ORDER  BY u.departamento, u.municipio, p.nombre;
+
+
+SELECT p.nombre  AS productor,
+       a.nombre  AS apiario,
+       u.municipio,
+       pr.nombre AS producto,
+       pr.precio
+FROM   productor          p
+JOIN   apiario            a  ON a.id_productor  = p.id_productor
+JOIN   productor_producto pp ON pp.id_productor = p.id_productor
+JOIN   producto           pr ON pr.id_producto  = pp.id_producto
+LEFT JOIN ubicacion       u  ON u.id_ubicacion  = a.id_ubicacion
+ORDER  BY p.nombre, a.nombre, pr.nombre;
+
+
+SELECT pe.id_pedido,
+       pe.fecha,
+       pe.estado,
+       p.id_productor,
+       p.nombre  AS productor,
+       c.id_consumidor,
+       c.nombre  AS consumidor,
+       u.municipio
+FROM   pedido     pe
+JOIN   productor  p  ON p.id_productor  = pe.id_productor
+JOIN   consumidor c  ON c.id_consumidor = pe.id_consumidor
+JOIN   apiario    a  ON a.id_productor  = p.id_productor
+JOIN   ubicacion  u  ON u.id_ubicacion  = a.id_ubicacion
+WHERE  u.municipio = 'Medellín'
+ORDER  BY pe.fecha DESC;

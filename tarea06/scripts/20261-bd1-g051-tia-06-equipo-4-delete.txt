@@ -1,0 +1,32 @@
+
+INSERT INTO producto (nombre, precio, descripcion)
+    VALUES ('Vinagre de miel', 15000.00, 'Producto en prueba - no comercializar');
+
+
+SELECT * FROM producto WHERE nombre = 'Vinagre de miel';
+
+
+DELETE FROM producto WHERE nombre = 'Vinagre de miel';
+
+
+SELECT * FROM producto WHERE nombre = 'Vinagre de miel';
+
+
+
+INSERT INTO usuario (nombre, email, id_rol)
+    VALUES ('Prueba Temporal', 'temp.productor@test.co', 2);
+
+INSERT INTO productor (nombre, telefono, id_usuario)
+    VALUES ('Apícola Prueba - Temporal', '3000000000',
+            (SELECT id_usuario FROM usuario WHERE email = 'temp.productor@test.co'));
+
+
+SELECT * FROM productor WHERE nombre LIKE '%Prueba%';
+
+
+DELETE FROM productor WHERE nombre = 'Apícola Prueba - Temporal';
+DELETE FROM usuario  WHERE email  = 'temp.productor@test.co';
+
+
+SELECT * FROM productor WHERE nombre LIKE '%Prueba%';
+SELECT * FROM usuario  WHERE email  = 'temp.productor@test.co';

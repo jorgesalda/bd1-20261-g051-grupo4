@@ -1,0 +1,112 @@
+
+INSERT INTO rol (nombre) VALUES
+    ('administrador'),
+    ('productor'),
+    ('inspector'),
+    ('consumidor');
+
+
+INSERT INTO usuario (nombre, email, id_rol) VALUES
+    ('Jorge Saldarriaga', 'jorge.s@apicola.co',  1),
+    ('Carlos Montoya',    'carlos.m@apicola.co',  2),
+    ('Laura Restrepo',    'laura.r@apicola.co',   2),
+    ('Ana Torres',        'ana.t@apicola.co',      3),
+    ('Pedro Gómez',       'pedro.g@apicola.co',   4);
+
+
+INSERT INTO entidad_apoyo (nombre, tipo) VALUES
+    ('Banco Agrario de Colombia', 'publica'),
+    ('Finagro',                   'publica'),
+    ('Fundación Natura',          'ONG');
+
+
+INSERT INTO ubicacion (departamento, municipio, vereda) VALUES
+    ('Antioquia',    'Medellín',    'Santa Elena'),
+    ('Antioquia',    'Rionegro',    'El Tablazo'),
+    ('Cundinamarca', 'Bogotá',      'Usme'),
+    ('Cundinamarca', 'Fusagasugá',  'La Aguadita'),
+    ('Boyacá',       'Tunja',       'Runta'),
+    ('Santander',    'Bucaramanga', 'Café Madrid'),
+    ('Huila',        'Neiva',       'El Caguán'),
+    ('Córdoba',      'Montería',    'Martinica');
+
+
+INSERT INTO producto (nombre, precio, descripcion) VALUES
+    ('Miel de abejas pura',    28000.00, 'Miel natural sin procesar, frasco 500g'),
+    ('Polen apícola seco',     22000.00, 'Polen deshidratado, bolsa 250g'),
+    ('Propóleo en tintura',    35000.00, 'Extracto de propóleo al 30%, frasco 30ml'),
+    ('Cera de abejas natural', 18000.00, 'Cera pura, bloque 200g'),
+    ('Jalea real fresca',      95000.00, 'Jalea real refrigerada, frasco 10g'),
+    ('Miel con propóleo',      32000.00, 'Miel enriquecida con propóleo, frasco 400g');
+
+
+INSERT INTO consumidor (nombre, email, telefono) VALUES
+    ('María Fernanda López', 'mflopez@gmail.com',   '3101234567'),
+    ('Ricardo Suárez',       'rsuarez@outlook.com', '3209876543'),
+    ('Sandra Millán',        'smillan@yahoo.com',   '3152345678'),
+    ('Felipe Cárdenas',      'fcardenas@gmail.com', '3003456789'),
+    ('Camila Ospina',        'cospina@hotmail.com', '3174567890');
+
+
+INSERT INTO productor (nombre, telefono, id_usuario) VALUES
+    ('Apícola Montoya - Carlos Montoya', '3006789012', 2),
+    ('Miel Restrepo - Laura Restrepo',   '3117890123', 3);
+
+
+INSERT INTO apiario (nombre, id_productor, id_ubicacion) VALUES
+    ('Apiario La Montaña', 1, 1),
+    ('Apiario El Bosque',  2, 3);
+
+
+INSERT INTO colmena (codigo, estado, id_apiario) VALUES
+    ('COL-001', 'activa',     1),
+    ('COL-002', 'activa',     1),
+    ('COL-003', 'cuarentena', 1),
+    ('COL-004', 'activa',     2),
+    ('COL-005', 'activa',     2),
+    ('COL-006', 'inactiva',   2);
+
+
+INSERT INTO sensor (tipo, id_colmena) VALUES
+    ('temperatura', 1),
+    ('humedad',     1),
+    ('peso',        2),
+    ('temperatura', 4),
+    ('humedad',     5);
+
+INSERT INTO registro_ambiental (temperatura, humedad, fecha_hora, id_sensor) VALUES
+    (34.2, 72.5, '2026-03-01 08:00:00', 1),
+    (35.1, 68.3, '2026-03-01 14:00:00', 1),
+    (36.0, 65.0, '2026-03-02 08:00:00', 4);
+
+
+INSERT INTO productor_producto (id_productor, id_producto) VALUES
+    (1, 1), (1, 2), (1, 3),
+    (2, 1), (2, 4), (2, 5);
+
+
+INSERT INTO lote_produccion (cantidad, fecha, id_apiario, id_producto) VALUES
+    (120, '2026-03-05', 1, 1),
+    (80,  '2026-03-05', 1, 2),
+    (200, '2026-03-10', 2, 1),
+    (60,  '2026-03-12', 2, 5);
+
+
+INSERT INTO pago (monto, metodo, id_consumidor) VALUES
+    ( 84000.00, 'transferencia', 1),
+    (195000.00, 'PSE',           2),
+    ( 50000.00, 'efectivo',      3);
+
+
+INSERT INTO pedido (fecha, estado, id_usuario, id_productor, id_consumidor, id_pago) VALUES
+    ('2026-03-15', 'entregado', 2, 1, 1, 1),
+    ('2026-03-18', 'entregado', 3, 2, 2, 2),
+    ('2026-03-20', 'pendiente', 2, 1, 3, 3);
+
+
+INSERT INTO detalle_pedido (cantidad, precio_venta, id_pedido, id_producto, id_lote) VALUES
+    (2, 28000.00, 1, 1, 1),
+    (1, 22000.00, 1, 2, 2),
+    (1, 95000.00, 2, 5, 4),
+    (2, 28000.00, 2, 1, 3),
+    (2, 22000.00, 3, 2, 2);

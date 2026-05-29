@@ -1,0 +1,102 @@
+
+SELECT u.departamento,
+       u.municipio,
+       COUNT(DISTINCT p.id_productor) AS total_productores
+FROM   productor p
+JOIN   apiario   a ON a.id_productor = p.id_productor
+JOIN   ubicacion u ON u.id_ubicacion = a.id_ubicacion
+GROUP  BY u.departamento, u.municipio
+ORDER  BY u.departamento, u.municipio;
+
+
+SELECT u.departamento,
+       u.municipio,
+       COUNT(DISTINCT pe.id_consumidor) AS total_consumidores
+FROM   pedido    pe
+JOIN   productor p  ON p.id_productor = pe.id_productor
+JOIN   apiario   a  ON a.id_productor = p.id_productor
+JOIN   ubicacion u  ON u.id_ubicacion = a.id_ubicacion
+GROUP  BY u.departamento, u.municipio
+ORDER  BY u.departamento, u.municipio;
+
+
+SELECT u.municipio,
+       a.nombre AS apiario,
+       COUNT(DISTINCT p.id_productor) AS total_productores
+FROM   productor p
+JOIN   apiario   a ON a.id_productor = p.id_productor
+JOIN   ubicacion u ON u.id_ubicacion = a.id_ubicacion
+WHERE  u.departamento = 'Antioquia'
+GROUP  BY u.municipio, a.nombre
+ORDER  BY u.municipio;
+
+
+SELECT u.departamento,
+       u.municipio,
+       a.nombre AS apiario,
+       COUNT(DISTINCT pe.id_pedido)       AS total_pedidos,
+       SUM(dp.cantidad * dp.precio_venta) AS total_COP
+FROM   pedido         pe
+JOIN   detalle_pedido dp ON dp.id_pedido   = pe.id_pedido
+JOIN   productor      p  ON p.id_productor = pe.id_productor
+JOIN   apiario        a  ON a.id_productor = p.id_productor
+JOIN   ubicacion      u  ON u.id_ubicacion = a.id_ubicacion
+WHERE  u.departamento = 'Antioquia'
+GROUP  BY u.departamento, u.municipio, a.nombre
+HAVING SUM(dp.cantidad * dp.precio_venta) > 50000
+ORDER  BY total_COP DESC;
+
+
+SELECT pr.nombre AS producto,
+       u.departamento,
+       u.municipio,
+       SUM(dp.cantidad) AS total_unidades_pedidas
+FROM   detalle_pedido dp
+JOIN   producto       pr ON pr.id_producto = dp.id_producto
+JOIN   pedido         pe ON pe.id_pedido   = dp.id_pedido
+JOIN   productor      p  ON p.id_productor = pe.id_productor
+JOIN   apiario        a  ON a.id_productor = p.id_productor
+JOIN   ubicacion      u  ON u.id_ubicacion = a.id_ubicacion
+GROUP  BY pr.nombre, u.departamento, u.municipio
+ORDER  BY total_unidades_pedidas DESC;
+
+
+
+SELECT p.nombre AS productor,
+       COUNT(pe.id_pedido) AS total_pedidos
+FROM   pedido pe
+JOIN   productor p ON p.id_productor = pe.id_productor
+GROUP  BY p.nombre
+ORDER  BY total_pedidos DESC
+LIMIT  1;
+
+
+SELECT u.departamento,
+       COUNT(DISTINCT pe.id_pedido) AS total_pedidos
+FROM   pedido    pe
+JOIN   productor p  ON p.id_productor = pe.id_productor
+JOIN   apiario   a  ON a.id_productor = p.id_productor
+JOIN   ubicacion u  ON u.id_ubicacion = a.id_ubicacion
+GROUP  BY u.departamento
+ORDER  BY total_pedidos DESC;
+
+
+SELECT pr.nombre,
+       SUM(dp.cantidad) AS total
+FROM   detalle_pedido dp
+JOIN   producto pr ON pr.id_producto = dp.id_producto
+GROUP  BY pr.nombre
+ORDER  BY total ASC
+LIMIT  1;
+
+
+SELECT u.municipio,
+       SUM(dp.cantidad * dp.precio_venta) AS monto_COP
+FROM   detalle_pedido dp
+JOIN   pedido    pe ON pe.id_pedido   = dp.id_pedido
+JOIN   productor p  ON p.id_productor = pe.id_productor
+JOIN   apiario   a  ON a.id_productor = p.id_productor
+JOIN   ubicacion u  ON u.id_ubicacion = a.id_ubicacion
+GROUP  BY u.municipio
+ORDER  BY monto_COP DESC
+LIMIT  1;
